@@ -665,15 +665,15 @@
                 </div>
 
             <!-- 구글 애드센스 광고 영역 -->
-            <div class="shop-panel" id="adsense-panel">
+            <div class="shop-panel" id="adsense-panel" hidden aria-hidden="true">
                 <div style="font-size: 0.75rem; color: var(--text-muted); text-align: left; margin-bottom: -4px;">스폰서 링크</div>
                 <div style="background: rgba(0, 0, 0, 0.2); border-radius: 8px; padding: 10px; text-align: center; height: 110px; overflow: hidden; display: flex; justify-content: center; align-items: center;">
                     <!-- 아래의 data-ad-client와 data-ad-slot을 본인의 애드센스 코드로 교체하세요 -->
-                    <ins class="adsbygoogle"
+                    <ins id="adsense-slot"
+                         class="adsbygoogle"
                          style="display:inline-block; width:100%; height:90px;"
-                         data-ad-client="ca-pub-XXXXXXXXXXXXXXXX"
+                         data-ad-client="ca-pub-5196833558159966"
                          data-ad-slot="YYYYYYYYYY"></ins>
-                    <script>(adsbygoogle = window.adsbygoogle || []).push({});</script>
                 </div>
             </div>
             </div> <!-- 메인 게임 영역(중앙) 끝 -->
@@ -876,6 +876,23 @@
             </div>
             </div> <!-- 주식 거래소 영역 끝 -->
         </div> <!-- game-layout 끝 -->
+
+        <!-- 구글 애드센스 봇을 위한 텍스트 콘텐츠 (게임 가이드 및 스토리) -->
+        <div class="game-description" style="background: rgba(15, 23, 42, 0.6); border: 1px solid rgba(255, 255, 255, 0.05); border-radius: 16px; padding: 24px; margin-top: 24px; color: var(--text-muted); font-size: 0.95rem;">
+            <h2 style="color: var(--text-main); font-size: 1.3rem; margin-bottom: 12px;">💻 K-직장인 퇴사 시뮬레이터 게임 가이드 및 세계관</h2>
+            <p style="margin-bottom: 12px;"><strong>"모니터를 부수고 당당하게 사표를 던지는 그날까지!"</strong></p>
+            <p style="margin-bottom: 12px;">이 게임은 매일 반복되는 야근과 스트레스 속에서 목표 퇴사 자금 <strong>100억 원</strong>을 모아 사장님 면전에 사표를 던지는 것을 목표로 하는 방치형/클리커 시뮬레이션 웹 게임입니다. 여러분은 신입사원으로 시작하여 다양한 야매 업무 툴과 사내 정치를 통해 초당 수입(CPS)을 극대화해 나가야 합니다.</p>
+            
+            <h3 style="color: var(--text-main); font-size: 1.1rem; margin-top: 16px; margin-bottom: 8px;">🎮 주요 시스템 및 공략 안내</h3>
+            <ul style="padding-left: 20px; margin-bottom: 12px; line-height: 1.6;">
+                <li style="margin-bottom: 6px;"><strong>코딩 노가다 & 업무 툴:</strong> 중앙의 노트북을 클릭해 수동으로 자금을 모으고, '매크로 마우스', 'AI 대필 프로그램', '사장님 약점 파일' 등을 업그레이드하여 자동 수입을 늘리세요.</li>
+                <li style="margin-bottom: 6px;"><strong>K-거래소 주식 투자 (하이리스크 노리턴):</strong> 상성전자, 화성갈끄니까 등 변동성 높은 주식에 투자하세요. 실시간 돌발 뉴스에 따라 주가가 폭등하거나 상장폐지될 수 있습니다.</li>
+                <li style="margin-bottom: 6px;"><strong>사내 해킹 & 미니게임:</strong> 3자리 비밀번호를 맞추는 숫자 야구 미니게임, 월급루팡 슬롯머신 등으로 비자금을 획득해 일확천금을 노리세요.</li>
+                <li style="margin-bottom: 6px;"><strong>돌발 결재 서류 이벤트:</strong> 화면을 가로지르는 결재 서류를 클릭해 보너스를 받으세요. 단, 함정(실수) 서류를 누르면 시말서를 쓰고 자산이 차감되니 주의가 필요합니다.</li>
+                <li><strong>환생(Prestige) 시스템:</strong> 100억 원을 달성하고 사표를 던지면, 더 높은 수익 배율(경력직 보너스)을 안고 새로운 직장에서 다시 시작할 수 있습니다.</li>
+            </ul>
+            <p>이 게임은 HTML, CSS, JavaScript로 제작된 웹 브라우저 기반 방치형 클리커 게임입니다. 브라우저를 닫아도 마지막 접속 시간을 기억하여 일정량의 오프라인 보상이 주어집니다. 완벽한 퇴사를 위해 지금 바로 자산 증식을 시작해 보세요!</p>
+        </div>
     </div>
 
     <!-- 엔딩 축하 모달 화면 -->
@@ -2285,8 +2302,35 @@
         }
 
         // 페이지가 열리면 자동으로 데이터 로딩 실행
+        function refreshAdsensePanel() {
+            const panel = document.getElementById('adsense-panel');
+            const slot = document.getElementById('adsense-slot');
+            if (!panel || !slot) return;
+
+            const client = slot.dataset.adClient || '';
+            const adSlot = slot.dataset.adSlot || '';
+            const isConfigured = client.startsWith('ca-pub-') && adSlot && adSlot !== 'YYYYYYYYYY' && !adSlot.includes('Y');
+            const hasPublisherContent = !!document.getElementById('money-display') && document.body.textContent.trim().length > 120;
+
+            const canShowAd = isConfigured && hasPublisherContent;
+            panel.hidden = !canShowAd;
+            panel.setAttribute('aria-hidden', String(!canShowAd));
+
+            if (!canShowAd || slot.dataset.adRequested === 'true') return;
+
+            try {
+                (window.adsbygoogle = window.adsbygoogle || []).push({});
+                slot.dataset.adRequested = 'true';
+            } catch (error) {
+                panel.hidden = true;
+                panel.setAttribute('aria-hidden', 'true');
+                console.warn('AdSense request was skipped.', error);
+            }
+        }
+
         window.onload = () => {
             loadGame();
+            refreshAdsensePanel();
             setTimeout(spawnBonusEvent, 10000);
             setTimeout(spawnNewsEvent, 25000);
         };
